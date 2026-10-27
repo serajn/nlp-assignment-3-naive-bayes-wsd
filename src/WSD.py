@@ -1,4 +1,5 @@
 import sys
+import math
 
 def load_dataset(filename):
     instances = []
@@ -34,6 +35,21 @@ def load_dataset(filename):
                 context.append(line)
 
     return instances
+
+def create_folds(instances):
+    n = len(instances)
+    fold_size = math.ceil(n / 5)
+
+    folds = []
+
+    for i in range(4):
+        start = i * fold_size
+        end = start + fold_size
+        folds.append(instances[start:end])
+
+    folds.append(instances[4 * fold_size:])
+
+    return folds
 
 def main():
     filename = sys.argv[1]

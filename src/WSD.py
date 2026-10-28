@@ -121,10 +121,17 @@ def predict_sense(test_data, sense_counts, word_counts, total_instances):
             # Log prior probability
             score = math.log(sense_count / total_instances)
 
+            vocabulary_size = len(word_counts[sense])
+
             # Score each observed word using Laplace smoothing
             for word in words:
                 word_count = word_counts[sense][word]
-                probability = (word_count + 1) / (sense_count + 2)
+
+                probability = (
+                    (word_count + 1) / 
+                    (sense_count + vocabulary_size)
+                )
+
                 score += math.log(probability)
 
             if score > best_score:

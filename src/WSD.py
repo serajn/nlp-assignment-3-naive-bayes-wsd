@@ -39,7 +39,38 @@ def load_dataset(filename):
     return instances
 
 def tokenize_context(context):
-    return re.findall(r"\b\w+\b", context.lower())
+    # Find the word or phrase within the <head> tags
+    head_match = re.search(
+        r"<head>(.*?)</head>",
+        context,
+        flags=re.IGNORECASE | re.DOTALL
+    )
+
+    target = head_match.group(1).strip().lower() if head_match else None
+
+    # Remove the tags and preserve the surrounding text
+    clean_context = re.sub(
+        r"</?head>",
+        "",
+        context,
+        flags=re.IGNORECASE
+    )
+
+    # Tokenize the context
+    words = re.findall(r"\b\w+\b", clean_context.lower())
+
+    # Exclude the target word from the feature list
+    if target:
+        target_tokens = re.findall(r"\b\w+\b", target)
+        words = words.copy()
+
+        start = len(re.findall(
+            r"\b\w+\b",
+            clean_context[:head_match.start()].lower()
+        ))
+        words[start:start + len(target_tokens)] = []
+
+    return words
 
 def create_folds(instances):
     n = len(instances)

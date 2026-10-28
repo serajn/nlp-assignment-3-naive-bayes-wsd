@@ -104,8 +104,36 @@ def collect_counts(train_data):
             word_counts[sense][word] += 1
 
         total_instances += 1
-        
+
     return sense_counts, word_counts, total_instances
+
+def predict_sense(test_data, sense_counts, word_counts, total_instances):
+    predictions = []
+
+    for instance in test_data:
+        words = tokenize_context(instance["context"])
+        words = set(words)
+
+        best_sense = None
+        best_score = -float('inf')
+
+        for sense, sense_count in sense_counts.items():
+            # Log prior probability
+            score = math.log(sense_count / total_instances)
+
+            # Score each observed word using Laplace smoothing
+            for word in words:
+                word_count = word_counts[sense][word]
+                probability = (word_count + 1) / (sense_count + 2)
+                score += math.log(probability)
+
+            if score > best_score:
+                best_score = score
+                best_sense = sense
+
+        predictions.append(best_sense)
+
+    return predictions
 
 
 def run_cross_validation(instances):
@@ -122,7 +150,11 @@ def run_cross_validation(instances):
                 train_data.extend(folds[j])
 
         # Learn statistics from the training fold
+        sense_counts, word_counts, total_instances = collect_counts(train_data)
+
         # Predict the sense of each test instance
+        predictions = predict_sense(test_data, sense_counts, word_counts, total_instances)
+
         # Save predictions and gold labels
     return None
 

@@ -90,7 +90,7 @@ def create_folds(instances):
 def collect_counts(train_data):
     sense_counts = Counter()
     word_counts = defaultdict(Counter)
-    total_words_per_sense = Counter()
+    total_instances = 0
 
     for instance in train_data:
         sense = instance["sense"]
@@ -100,10 +100,12 @@ def collect_counts(train_data):
 
         words = tokenize_context(context)
 
-        for word in words:
+        for word in set(words):
             word_counts[sense][word] += 1
-            total_words_per_sense[sense] += 1
-    return sense_counts, word_counts, total_words_per_sense
+
+        total_instances += 1
+        
+    return sense_counts, word_counts, total_instances
 
 
 def run_cross_validation(instances):

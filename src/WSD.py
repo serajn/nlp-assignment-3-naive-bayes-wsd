@@ -142,6 +142,16 @@ def predict_sense(test_data, sense_counts, word_counts, total_instances):
 
     return predictions
 
+def evaluate(all_predictions, all_gold_labels):
+    correct = sum(
+        prediction == gold
+        for prediction, gold in zip(all_predictions, all_gold_labels)
+    )
+
+    accuracy = correct / len(all_gold_labels) if all_gold_labels else 0.0
+
+    return accuracy
+
 
 def run_cross_validation(instances):
     folds = create_folds(instances)
@@ -163,7 +173,10 @@ def run_cross_validation(instances):
         predictions = predict_sense(test_data, sense_counts, word_counts, total_instances)
 
         # Save predictions and gold labels
-    return None
+        all_predictions.extend(predictions)
+        all_gold_labels.extend(instance["sense"] for instance in test_data)
+
+    return evaluate(all_predictions, all_gold_labels)
 
 def main():
     filename = sys.argv[1]

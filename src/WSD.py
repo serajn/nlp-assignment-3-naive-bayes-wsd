@@ -155,6 +155,10 @@ def evaluate(all_predictions, all_gold_labels):
 
 def run_cross_validation(instances):
     folds = create_folds(instances)
+
+    fold_accuracies = []
+    fold_predictions = []
+
     all_predictions = []
     all_gold_labels = []
 
@@ -172,24 +176,66 @@ def run_cross_validation(instances):
         # Predict the sense of each test instance
         predictions = predict_sense(test_data, sense_counts, word_counts, total_instances)
 
+        gold_labels = [instance["sense"] for instance in test_data]
+
+        # Evaluate this fold
+        accuracy = evaluate(predictions, gold_labels)
+        fold_accuracies.append(accuracy)
+
+        print(f"Fold {i + 1} accuracy: {accuracy * 100:.2f}%")
+
+        fold_predictions.append([
+            (instance["id"], prediction)
+            for instance, prediction in zip(test_data, predictions)
+        ])
+
         # Save predictions and gold labels
         all_predictions.extend(predictions)
         all_gold_labels.extend(instance["sense"] for instance in test_data)
 
-    return evaluate(all_predictions, all_gold_labels)
+    average_accuracy = (
+        sum(fold_accuracies) / len(fold_accuracies)
+        if fold_accuracies else 0.0
+    )
+
+    print(f"Average accuracy: {average_accuracy * 100:.2f}%")
+
+    # Overall accuracy across all test instances
+    overall_accuracy = evaluate(all_predictions, all_gold_labels)
+    print(f"Overall accuracy: {overall_accuracy * 100:.2f}%")
+
+    return fold_predictions
+
+def write_predictions_to_file(fold_predictions, filename=None):
+    if filename is None:
+        print("No filename provided, using default 'plant.wsd.out'")
+        filename = "plant.wsd.out"
+
+    with open(filename, 'w', encoding='utf-8') as output_file:
+        for i, predictions in enumerate(fold_predictions, start=1):
+            output_file.write(f"Fold {i}:\n")
+
+            for instance_id, predicted_sense in predictions:
+                output_file.write(
+                    f"{instance_id} {predicted_sense}\n"
+                )
 
 def main():
     filename = sys.argv[1]
 
     dataset = load_dataset(filename)
+    fold_predictions = run_cross_validation(dataset)
+    write_predictions_to_file(fold_predictions, "plant.wsd.out")
 
+    # Debugging section for writing all instances to a file
+    '''
     with open("../debug/instances.txt", 'w') as output_file:
         for instance in dataset:
             output_file.write(f"Instance ID: {instance['id']}\n")
             output_file.write(f"Sense ID: {instance['sense']}\n")
             output_file.write(f"Context: {instance['context']}\n")
             output_file.write("\n")
-
+    '''
     return 0
 
 if __name__ == "__main__":

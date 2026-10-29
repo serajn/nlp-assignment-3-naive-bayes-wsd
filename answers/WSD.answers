@@ -1,0 +1,113 @@
+1. Completeness of Program:
+    - Take one argument consisting of the name of one file      Complete
+    - Load dataset (extract relevent information)               Complete
+    - Tokenize context                                          Complete
+    - Create folds                                              Complete
+    - Collect counts from training fold                         Complete
+    - Predict sense                                             Complete
+    - Evaluate predictions                                      Complete
+    - Report results and write results to file                  Complete
+
+    All steps successfully completed.
+
+2. Dataset Name:
+    plant.wsd
+
+3. System accuracy:
+    Fold 1 accuracy:  94.74%
+    Fold 2 accuracy:  71.05%
+    Fold 3 accuracy:  71.05%
+    Fold 4 accuracy:  92.11%
+    Fold 5 accuracy:  83.33%
+    Average accuracy: 82.46%
+
+    Overall accuracy: 82.45%
+
+4. Error analysis:
+    Error 1: plant.1000019 Predicted: plant%living Gold-label: plant%factory
+    
+    A possible reason for the misclassification could be that individual words may have 
+    misleading statistical associations. Instance 1000019 for example, contains words such
+    as natural, flow, and air, which could occur in contexts with living organisms. Since 
+    Niave Bayes treats each feature as mutually independent, it is possible the model did not
+    fully understand the realtionships between the combination of words.
+
+    This would be an inherent weakness of Niave Bayes. Possibly either a different variant of Niave
+    Bayes or an entirely different apporach could potentially be the solution.
+
+    Error 2: plant.1000036 Predicted: plant%living Gold-label: plant%factory
+
+    The following example contains words such as "chemical", "company", "build",
+    and "plans". A human reader would normally associate such words with the factory sense of a plant.
+    However, it is possible that these words have a weak statistical association. If these words don't
+    occur frequently enough, then Niave Bayes wouldn't give them much weight.
+
+    A possible solution to this potential problem could be the inclusion of more words that are being given
+    less wight by the model but would be associated with a given sense by a human reader.
+
+    Error 3: plant.1000048 Predicted: plant%living Gold-label: plant%factory
+
+    This is the third example such that the predicted sense label is the living sense when in fact the actual
+    sense is the factory sense. It is possible that the dataset contains more instances in the living sense
+    than the factory sense. If this is true, the model may be relying on the prior probability. This would indicate
+    a class imbalance.
+
+    A potential correction could be to balance the classes.
+
+    
+    Additional Word Sense Disambiguation Experiments
+
+    1. Complete
+    2. bass.wsd
+    3. 
+        Fold 1 accuracy: 27.27%
+        Fold 2 accuracy: 4.55%
+        Fold 3 accuracy: 9.09%
+        Fold 4 accuracy: 4.55%
+        Fold 5 accuracy: 5.26%
+        Average accuracy: 10.14%
+        Overall accuracy: 10.28%
+
+    1. Complete
+    2. crane.wsd
+    3.
+        Fold 1 accuracy: 31.58%
+        Fold 2 accuracy: 26.32%
+        Fold 3 accuracy: 26.32%
+        Fold 4 accuracy: 21.05%
+        Fold 5 accuracy: 21.05%
+        Average accuracy: 25.26%
+        Overall accuracy: 25.26%
+
+    1. Complete
+    2. motion.wsd
+    3.
+        Fold 1 accuracy: 51.22%
+        Fold 2 accuracy: 48.78%
+        Fold 3 accuracy: 36.59%
+        Fold 4 accuracy: 46.34%
+        Fold 5 accuracy: 43.24%
+        Average accuracy: 45.23%
+        Overall accuracy: 45.27%
+
+    1. Complete
+    2. palm.wsd
+    3. 
+        Fold 1 accuracy: 82.93%
+        Fold 2 accuracy: 78.05%
+        Fold 3 accuracy: 87.80%
+        Fold 4 accuracy: 82.93%
+        Fold 5 accuracy: 81.08%
+        Average accuracy: 82.56%
+        Overall accuracy: 82.59%
+    
+    1. Complete
+    2. tank.wsd
+    3.
+        Fold 1 accuracy: 73.17%
+        Fold 2 accuracy: 63.41%
+        Fold 3 accuracy: 78.05%
+        Fold 4 accuracy: 90.24%
+        Fold 5 accuracy: 86.49%
+        Average accuracy: 78.27%
+        Overall accuracy: 78.11%
